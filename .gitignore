@@ -1,4 +1,5 @@
 .stack-work/
 *~
 
-cypher.txt
+/cypher.txt
+/hs-cypher-exe.prof

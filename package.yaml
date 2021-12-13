@@ -20,9 +20,11 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/tim-clifford/hs-cypher#readme>
 
 dependencies:
-- base >= 4.7 && < 5
+- base
 - split
 - sort
+- unordered-containers
+- fixed-vector
 
 library:
   source-dirs: src
@@ -35,6 +37,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -fno-warn-tabs
     dependencies:
     - hs-cypher
 
