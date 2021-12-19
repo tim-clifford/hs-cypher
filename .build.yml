@@ -1,0 +1,11 @@
+image: archlinux
+sources:
+  - https://git.sr.ht/~tcarrio/git-mirror
+  - https://git.sr.ht/~tim-clifford/hs-cypher
+environment:
+  PROJECT_DIR: hs-cypher
+  GIT_TARGET_REPO: git@github.com:tim-clifford/hs-cypher.git
+secrets:
+  - 9ee7c8f6-f330-46d7-8339-574c3d774548
+tasks:
+  - mirror-all: git-mirror/git-mirror.sh $PROJECT_DIR

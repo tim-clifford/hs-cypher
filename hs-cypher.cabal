@@ -32,7 +32,9 @@ library
       src
   build-depends:
       base
+    , directory
     , fixed-vector
+    , serialise
     , sort
     , split
     , unordered-containers
@@ -50,8 +52,10 @@ executable hs-cypher-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N -fno-warn-tabs
   build-depends:
       base
+    , directory
     , fixed-vector
     , hs-cypher
+    , serialise
     , sort
     , split
     , unordered-containers
@@ -67,8 +71,10 @@ test-suite hs-cypher-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base
+    , directory
     , fixed-vector
     , hs-cypher
+    , serialise
     , sort
     , split
     , unordered-containers

@@ -25,6 +25,8 @@ dependencies:
 - sort
 - unordered-containers
 - fixed-vector
+- serialise
+- directory
 
 library:
   source-dirs: src

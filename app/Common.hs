@@ -18,19 +18,20 @@ englishAlphabet = V.fromList' "abcdefghijklmnopqrstuvwxyz"
 
 letterFrequency = [0.0817, 0.0149, 0.0278, 0.0425, 0.127, 0.0223, 0.0202, 0.0609, 0.0697, 0.0015, 0.0077, 0.0402, 0.0241, 0.0675, 0.0751, 0.0193, 0.0009, 0.0599, 0.0633, 0.0906, 0.0276, 0.0098, 0.0236, 0.0015, 0.0197, 0.0007]
 
-checkEnglish :: RealFrac a => S.HashSet [Char] -> a -> [Char] -> Bool
-checkEnglish words thresh text = matchToThreshold
-		(floor (thresh * fromIntegral (length textWords)))
-		(`S.member` words)
-		textWords
-	where textWords = splitOn " " $ map lower text
+checkEnglish :: Integral a => S.HashSet [Char] -> a -> [Char] -> Bool
+checkEnglish words thresh text = checkEnglishList
+	words thresh (splitOn " " $ map lower text)
 
-matchToThreshold :: Int -> (a -> Bool) -> [a] -> Bool
-matchToThreshold n _ _
-	| n <= 0 = True
-matchToThreshold n _ [] = False
-matchToThreshold n p (x:xs) =
-  matchToThreshold (if p x then n-1 else n) p xs
+checkEnglishList :: Integral a => S.HashSet [Char] -> a -> [[Char]] -> Bool
+checkEnglishList words thresh =
+	-- thresh successive successes = True
+	-- thresh successive failures  = False
+	checkEnglish' words thresh thresh
+	where checkEnglish' _ _ 0 _  = True
+	      checkEnglish' _ _ _ [] = False
+	      checkEnglish' words thresh rem (w:textwords)
+			| w `elem` words = checkEnglish' words thresh (rem-1) textwords
+			| otherwise = checkEnglish' words thresh thresh textwords
 
 likelihood :: [Char] -> Float
 likelihood cs = sum $ zipWith (*) letterFrequency (getFrequencies cs)

@@ -18,7 +18,9 @@ import Data.Vector.Fixed.Unboxed (Vec)
 import Common
 
 crackMAS :: [Char] -> [Char]
-crackMAS cyphertext = "Not implemented"
+crackMAS cyphertext =
+	let cypherWords = splitOn " " $ map lower cyphertext
+	return "Not implemented"
 
 -- might break if they're not a-z
 mas :: Alphabet -> Char -> Char
@@ -34,20 +36,17 @@ partialMAS alph c
 	| snd c' = lower (fst c')
 	| otherwise = upper c
 	where x  = char26 c
-	      c' = alph V.! (fromMaybe (-1) x)
+	      c' = alph V.! fromMaybe (-1) x
 
 invertAlphabet :: AnnotatedAlphabet -> AnnotatedAlphabet
 invertAlphabet alph =
 	foldl (\alph x ->
 		let k = char26 (fst (fst x)) in
 		if snd (fst x) && isJust k then
-			unsafeSet (fromJust k) (chr ((snd x) + 97), True) alph
+			unsafeSet (fromJust k) (chr (snd x + 97), True) alph
 		else
 			alph
 	) (fromAlphabet englishAlphabet) (zip (V.toList alph) [0..25])
-
-	--zip (map lower $ V.toList alph) (V.toList englishAlphabet)
-	-- & sort & map snd & V.fromList'
 
 -- True denotes a character that has been changed. Another option would be to
 -- use capitals but I want this to be extendable to other character sets
@@ -61,13 +60,21 @@ toAlphabet = V.map fst
 
 cribAttack :: [Char] -> [[Char]] -> AnnotatedAlphabet -> [AnnotatedAlphabet]
 cribAttack _ [] _ = [fromAlphabet englishAlphabet]
-cribAttack cyphertext cribs alph =
+cribAttack cyphertext (crib:cribs) alph =
 	catMaybes [
 		joinAlphabets a b |
 			-- not sure why i couldn't pattern match head and tail
-			a <- allPossibleAlphs cyphertext (head cribs) alph,
-			b <- cribAttack       cyphertext (tail cribs) alph
+			a <- allPossibleAlphs cyphertext crib  alph,
+			b <- cribAttack       cyphertext cribs alph
 	]
+
+filterOnWords :: Integral a => S.HashSet [Char] -> [Char] -> a -> [AnnotatedAlphabet] -> [AnnotatedAlphabet]
+filterOnWords words cyphertext thresh = filter (\alph ->
+		map (partialMAS (invertAlphabet alph)) cyphertext
+		& splitOn " "
+		& filter (\w -> w == map lower w)
+		& checkEnglishList words thresh
+	)
 
 allPossibleAlphs :: [Char] -> [Char] -> AnnotatedAlphabet -> [AnnotatedAlphabet]
 allPossibleAlphs cyphertext textword alph =
@@ -92,7 +99,7 @@ addWordToAlphabet alph cypher text
 
 joinAlphabets :: AnnotatedAlphabet -> AnnotatedAlphabet -> Maybe AnnotatedAlphabet
 joinAlphabets a b =
-	if isJust joined && (length $ S.fromList $ V.toList $ fromJust joined) == 26
+	if isJust joined && length (S.fromList $ V.toList $ fromJust joined) == 26
 	then
 		joined
 	else

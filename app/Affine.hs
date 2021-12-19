@@ -8,15 +8,15 @@ import qualified Data.HashSet as S
 import Common
 
 crackAffine :: S.HashSet [Char] -> [Char] -> [Char]
-crackAffine words ciphertext =
-	sortLinear reverseAffine affineMultipliers [0..25] ciphertext
-	& map (\x -> map (uncurry reverseAffine x) ciphertext)
-	& filter (checkEnglish words 0.5)
+crackAffine words cyphertext =
+	sortLinear reverseAffine affineMultipliers [0..25] cyphertext
+	& map (\x -> map (uncurry reverseAffine x) cyphertext)
+	& filter (checkEnglish words 3)
 	& head
 
 sortLinear :: (Num a, Num b) => (a -> b -> Char -> Char) -> [a] -> [b] -> String -> [(a, b)]
-sortLinear f as bs ciphertext = reverse $ sortOn
-	(\(a,b) -> likelihood $ map (f a b) ciphertext)
+sortLinear f as bs cyphertext = reverse $ sortOn
+	(\(a,b) -> likelihood $ map (f a b) cyphertext)
 	[(a, b) | a <- as, b <- bs]
 
 affineMultipliers = [1,3,5,7,9,11,15,17,19,21,23,25]
